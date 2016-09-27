@@ -24,6 +24,7 @@ Its also an exercise to use one language for backend server, web and mobile fron
 Basic skeleton done with one simple REST service added without any persistence
 
 *TODOs*
+
 1. Add actor implementation and its for basic functions of chat as listed above
 2. Add persistence for in-memory data so that when server is restarted it remembers all organizations, users and channels
 3. Modify project and add SBT support for scalajs - web
