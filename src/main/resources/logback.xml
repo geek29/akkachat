@@ -1,0 +1,45 @@
+<configuration scan="true">
+
+    <property name="LOG_PATH" value="logs"/>
+
+    <appender name="activeAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date{ISO8601} %-5level %logger{36} %X{sourceThread} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="notActiveAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${PROC_NAME}.log</file>
+        <encoder>
+            <pattern>%date{ISO8601} %-5level %logger{36} %X{sourceThread} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${PROC_NAME}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="akka" level="debug" additivity="false">
+        <appender-ref ref="activeAppender"/>
+    </logger>
+
+   <logger name="org.apache.http" level="info" additivity="false">
+        <appender-ref ref="activeAppender"/>
+    </logger>
+
+    <logger name="spray.can.client" level="info" additivity="false">
+        <appender-ref ref="activeAppender"/>
+    </logger>
+
+    <logger name="org.apache.http.wire" level="warn" additivity="false">
+        <appender-ref ref="ROLLING"/>
+    </logger>
+
+    <root level="debug">
+        <appender-ref ref="activeAppender"/>
+    </root>
+
+</configuration>
