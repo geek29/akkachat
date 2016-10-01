@@ -3,11 +3,12 @@ package akkachat.actors
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akkachat.actors.OrganizationActor._
 import akkachat.domain.{Channel, Organization, OrganizationUser, User}
+import akkachat.support.AsyncSupport
 
 /**
   * Created by tushark on 25/9/16.
   */
-class OrganizationActor(organization: Organization) extends Actor with ActorLogging {
+class OrganizationActor(organization: Organization) extends Actor with ActorLogging  with AsyncSupport {
 
   var users: List[OrganizationUser] = List[OrganizationUser]()
   var channels: List[Channel] = List[Channel]()
@@ -66,7 +67,7 @@ object OrganizationActor {
   case class ChannelAlreadyAdded(name: String) extends  OrgActorMessages
   case class ChannelAdded(name: String) extends  OrgActorMessages
 
-  case class OrgNotFound(nane: String) extends  OrgActorMessages
+  case class OrgNotFound(name: String) extends  OrgActorMessages
   //RequestInvite
   //
 

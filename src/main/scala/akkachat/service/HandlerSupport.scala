@@ -64,9 +64,7 @@ trait HandlerSupport {
     list.reduceLeft { (filter1, filter2) =>
       filter1(targetMsg) match {
         case k: Some[(StatusCode, ServiceResponse)] =>
-        { targetMsg =>
-          k
-        }
+         targetMsg => k
         case None =>
           filter2
       }

@@ -42,7 +42,7 @@ class ChatActor extends Actor with ActorLogging {
       case Some(organization) =>
         context.actorSelection(s"org-$name") forward(m)
       case None =>
-        sender() ! OrgNotFound
+        sender() ! OrgNotFound(name)
     }
   }
 

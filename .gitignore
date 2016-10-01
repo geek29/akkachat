@@ -1,5 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
 
+#Akkachat specific
+src/main/scala/akkachat/support/TestStub.scala
+
 ### Java template
 *.class
 
