@@ -17,8 +17,12 @@ package object domain {
 
   sealed trait ChatMessage
 
-  case class TextChatMessage(from: OrganizationUser, txt: String)
+  case class TextChatMessage(from: User, txt: String)
 
-  case class MarkDownMessage(from: OrganizationUser, txt: String)
+  case class MarkDownMessage(from: User, txt: String)
+
+  case class ChannelChatMessage(user: User, ts: Long, msg: ChatMessage)
+
+  case class P2PChatMessage(from: User, to : User, ts: Long, msg: ChatMessage)
 
 }

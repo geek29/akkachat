@@ -1,6 +1,7 @@
 package akkachat.actors
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
+import akkachat.actors.ChannelActor.{AddUserToChannel, ChannelActorCommands, ChatMessageCmd, ListChannelUsers}
 import akkachat.domain.Organization
 import akkachat.actors.ChatActor.{AddOrganization, OrgAdded, OrgAlreadyPresent}
 import akkachat.actors.OrganizationActor._
@@ -28,6 +29,8 @@ class ChatActor extends Actor with ActorLogging {
       addOrganization(k, sender())
     case m: OrgActorCommands =>
       forwardToOrg(m)
+    case k: ChannelActorCommands =>
+      forwardToChannelOrg(k)
 
   }
 
@@ -38,6 +41,21 @@ class ChatActor extends Actor with ActorLogging {
       case k: RequestInvite => k.orgName
       case k: AcceptInvite => k.orgName
       case k: ListInvites => k.orgName
+    }
+
+    organizations.find(p => p.name == name) match {
+      case Some(organization) =>
+        context.actorSelection(s"org-$name") forward(m)
+      case None =>
+        sender() ! OrgNotFound(name)
+    }
+  }
+
+  def forwardToChannelOrg(m: ChannelActorCommands) = {
+    val name = m match {
+      case k: AddUserToChannel => k.orgName
+      case k: ListChannelUsers => k.orgName
+      case k: ChatMessageCmd => k.orgName
     }
 
     organizations.find(p => p.name == name) match {
