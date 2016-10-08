@@ -2,7 +2,7 @@ package akkachat.actors
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akkachat.actors.OrganizationActor._
-import akkachat.domain.{Channel, Organization, OrganizationUser, User}
+import akkachat.domain._
 import akkachat.support.AsyncSupport
 
 /**
@@ -12,14 +12,49 @@ class OrganizationActor(organization: Organization) extends Actor with ActorLogg
 
   var users: List[OrganizationUser] = List[OrganizationUser]()
   var channels: List[Channel] = List[Channel]()
-
-
+  var invites: List[OrganizationInvite] = List[OrganizationInvite]()
 
   override def receive: Receive = {
     case k: AddUser =>
       addUser(k.user, sender())
     case k: CreateChannel =>
       createChannel(k.name, sender())
+    case k: RequestInvite =>
+      addInvite(k.user, sender())
+    case k: AcceptInvite =>
+      acceptInvite(k.email, sender())
+    case k: ListInvites =>
+      listInvites(sender())
+  }
+
+  def addInvite(user: User, ref: ActorRef): Unit = {
+    invites.find( p => p.user.email == user.email) match {
+      case Some(k) =>
+        sender ! UserAlreadyAdded(user.email)
+      case None =>
+        val resp = users.find( p => p.user.email == user.email) match {
+          case Some(k) =>
+            UserAlreadyAdded(user.email)
+          case None =>
+            invites = OrganizationInvite(user) :: invites
+            InviteAdded(user.email)
+        }
+        ref ! resp
+    }
+  }
+
+  def acceptInvite(email: String, ref: ActorRef): Unit = {
+    invites.find( p => p.user.email == email) match {
+      case Some(k) =>
+        invites = invites.filterNot( p => p.user.email == email)
+        addUser(k.user, ref)
+      case None =>
+        sender ! InviteMissing(email)
+    }
+  }
+
+  def listInvites(ref: ActorRef): Unit = {
+    ref ! InviteList(invites)
   }
 
 
@@ -43,7 +78,7 @@ class OrganizationActor(organization: Organization) extends Actor with ActorLogg
 
   def createChannel(name: String, ref: ActorRef): Unit = {
     //validate that users is not added before
-    channels.find( p => p.name == p.name) match {
+    channels.find( p => p.name == name) match {
       case Some(k) =>
         sender ! ChannelAlreadyAdded(k.name)
       case None =>
@@ -57,19 +92,26 @@ class OrganizationActor(organization: Organization) extends Actor with ActorLogg
 
 object OrganizationActor {
   sealed trait OrgActorCommands
-  case class AddUser(name: String, user: User) extends OrgActorCommands
+  case class AddUser(orgName: String, user: User) extends OrgActorCommands
   case class CreateChannel(orgName: String, name: String) extends OrgActorCommands
+  case class RequestInvite(orgName: String, user: User) extends OrgActorCommands
+  case class AcceptInvite(orgName: String, email: String) extends OrgActorCommands
+  case class ListInvites(orgName: String) extends OrgActorCommands
 
   sealed trait OrgActorMessages
   case class UserAlreadyAdded(email: String) extends  OrgActorMessages
   case class UserAdded(email: String) extends  OrgActorMessages
 
+  case class InviteAdded(email: String) extends OrgActorMessages
+  case class InviteMissing(email: String) extends OrgActorMessages
+  case class InviteAccepted(email: String) extends OrgActorMessages
+
+  case class InviteList(list: List[OrganizationInvite]) extends OrgActorMessages
+
   case class ChannelAlreadyAdded(name: String) extends  OrgActorMessages
   case class ChannelAdded(name: String) extends  OrgActorMessages
-
   case class OrgNotFound(name: String) extends  OrgActorMessages
-  //RequestInvite
-  //
+
 
   def props(organization: Organization): Props = Props(new OrganizationActor(organization))
 

@@ -13,4 +13,12 @@ package object domain {
 
   case class Channel(name: String, users: List[OrganizationUser])
 
+  case class OrganizationInvite(user: User)
+
+  sealed trait ChatMessage
+
+  case class TextChatMessage(from: OrganizationUser, txt: String)
+
+  case class MarkDownMessage(from: OrganizationUser, txt: String)
+
 }
