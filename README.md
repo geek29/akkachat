@@ -1,8 +1,8 @@
 ## Akkachat
 
-Akkachat is slack like application written in scala to *learn* different aspect of scala programming language like functional programming, actor based concurrency, reactive streams
+Akkachat is a slack like application written in scala to *learn* different aspects of scala programming language such as functional programming, actor based concurrency, reactive streams.
 
-Its also an exercise to use one language for backend server, web and mobile fronted
+It's also an exercise to use one language for back-end server, web and mobile front-end
 
 # Frameworks used
 - Akka
